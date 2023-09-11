@@ -1,0 +1,225 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Utilisateur {
+  id           Int            @id @default(autoincrement())
+  nom          String
+  prenom       String
+  password     String
+  email        String         @unique
+  telephone    Int
+  wilaya       String
+  adresse      String
+  credit       Float
+  verifier     Boolean        @default(false)
+  Review       Review[]
+  Reclamation  Reclamation[]
+  Favori       Favori[]
+  Commande     Commande[]
+  Magasin      Magasin[]
+  Notification Notification[]
+  createdAt    DateTime       @default(now())
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  nom      String
+  prenom   String
+  password String
+  email    String @unique
+}
+
+model Livreur {
+  id        Int         @id @default(autoincrement())
+  nom       String
+  prenom    String
+  password  String
+  email     String      @unique
+  telephone Int
+  wilaya    String
+  adresse   String
+  libre     Boolean
+  Livraison Livraison[]
+}
+
+model Produit {
+  id               Int                @id @default(autoincrement())
+  nom              String
+  description      String             @db.Text
+  prix             Float
+  quantity         Int
+  magasin          Magasin            @relation(fields: [magasinId], references: [id], onDelete: Cascade)
+  magasinId        Int
+  images           Image[]
+  Sous_Categorie   Sous_Categorie     @relation(fields: [sous_CategorieId], references: [id], onDelete: Cascade)
+  sous_CategorieId Int
+  Review           Review[]
+  Favori           Favori[]
+  Depot            Depot              @relation(fields: [depotId], references: [id], onDelete: Cascade)
+  depotId          Int
+  Commande_Produit Commande_Produit[]
+  discounts        Discount[]
+  createdAt        DateTime           @default(now())
+}
+
+model Image {
+  id        Int     @id @default(autoincrement())
+  image_url String
+  Produit   Produit @relation(fields: [produitId], references: [id], onDelete: Cascade)
+  produitId Int
+}
+
+model Magasin {
+  id                Int         @id @default(autoincrement())
+  nom               String
+  description       String
+  logo              String      @default("https://res.cloudinary.com/dodzuvmxz/image/upload/v1684270881/magasins-logo/Rectangle_16_orp09u.png")
+  etat              String      @default("non-validé")
+  register_commerce String
+  produits          Produit[]
+  Depot             Depot[]
+  Categorie         Categorie   @relation(fields: [categorieId], references: [id], onDelete: Cascade)
+  categorieId       Int
+  Utilisateur       Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  utilisateurId     Int
+  createdAt         DateTime    @default(now())
+}
+
+model Depot {
+  id        Int       @id @default(autoincrement())
+  nom       String
+  wilaya    String
+  adresse   String
+  magasin   Magasin   @relation(fields: [magasinId], references: [id], onDelete: Cascade)
+  magasinId Int
+  produits  Produit[]
+}
+
+model Categorie {
+  id             Int              @id @default(autoincrement())
+  nom            String
+  description    String
+  magasin        Magasin[]
+  Sous_Categorie Sous_Categorie[]
+}
+
+model Sous_Categorie {
+  id          Int       @id @default(autoincrement())
+  nom         String
+  description String
+  categorieId Int
+  categorie   Categorie @relation(fields: [categorieId], references: [id], onDelete: Cascade)
+  produits    Produit[]
+}
+
+model Commande {
+  id                Int                @id @default(autoincrement())
+  etat              String
+  totale            Float
+  methode_paiement  String
+  date              String
+  utilisateurId     Int
+  utilisateur       Utilisateur        @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  commande_produits Commande_Produit[]
+}
+
+model Commande_Produit {
+  id              Int            @id @default(autoincrement())
+  quantity        Int
+  produitId       Int
+  produit         Produit        @relation(fields: [produitId], references: [id], onDelete: Cascade)
+  Commande        Commande       @relation(fields: [commandeId], references: [id], onDelete: Cascade)
+  commandeId      Int
+  remboursementId Int?
+  remboursement   Remboursement?
+  livraison       Livraison[]
+  etat            String
+}
+
+model Code_Promo {
+  id         Int      @id @default(autoincrement())
+  percentage Int
+  code       String   @unique
+  data_fin   DateTime
+}
+
+model Carte_Cadeau {
+  id     Int     @id @default(autoincrement())
+  code   String  @unique
+  valeur Float
+  valide Boolean
+}
+
+model Review {
+  id            Int         @id @default(autoincrement())
+  evaluation    Int
+  title         String
+  description   String?
+  date          String
+  utilisateurId Int
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  produitId     Int
+  produit       Produit     @relation(fields: [produitId], references: [id], onDelete: Cascade)
+}
+
+model Reclamation {
+  id            Int         @id @default(autoincrement())
+  type          String
+  description   String
+  titre         String
+  utilisateurId Int
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+}
+
+model Favori {
+  id            Int         @id @default(autoincrement())
+  utilisateurId Int
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  produitId     Int
+  produit       Produit     @relation(fields: [produitId], references: [id])
+}
+
+model Livraison {
+  id                 Int              @id @default(autoincrement())
+  livreurId          Int?
+  livreur            Livreur?         @relation(fields: [livreurId], references: [id], onDelete: Cascade)
+  commandeId         Int
+  salaire            Float
+  Commande_Produit   Commande_Produit @relation(fields: [commande_ProduitId], references: [id], onDelete: Cascade)
+  commande_ProduitId Int
+  etat               String
+  adresse            String
+  wilaya             String
+}
+
+model Remboursement {
+  id               Int              @id @default(autoincrement())
+  description      String
+  produitId        Int              @unique
+  commande_produit Commande_Produit @relation(fields: [produitId], references: [id], onDelete: Cascade)
+  etat             String
+}
+
+model Discount {
+  id          Int     @id @default(autoincrement())
+  pourcentage Int
+  date_debut  String
+  date_fin    String
+  valide      Boolean
+  produitId   Int
+  produit     Produit @relation(fields: [produitId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id            Int         @id @default(autoincrement())
+  utilisateurId Int
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  description   String
+}
