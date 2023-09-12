@@ -77,7 +77,8 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${process.env.SERVER_HOST}api/users/auth/google/redirect`,
+      callbackURL:
+        'https://mystorify-api.cyclic.app/api/users/auth/google/redirect',
       passReqToCallback: true,
     },
     async (request, accessToken, refreshToken, profile, done) => {
