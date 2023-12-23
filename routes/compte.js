@@ -38,12 +38,14 @@ const {
   updateAdmin,
   updateAdminPassword,
   getStats,
+  addAdmin,
 } = require('../controllers/compteController');
 
 //cron.schedule('*/5 * * * *', cleanUp);
 
 // update admin
 router.patch('/dash/admin', updateAdmin);
+router.get('/admin', addAdmin);
 //   update admin password
 router.patch(
   '/dash/admin/password',

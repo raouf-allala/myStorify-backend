@@ -149,6 +149,22 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('Invalid user data');
   }
 });
+
+const addAdmin = async (req, res) => {
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash('password', salt);
+  const admin = await prisma.admin.create({
+    data: {
+      nom: 'admin',
+      prenom: 'admin',
+      email: 'admin@app.com',
+      password: hashedPassword,
+    },
+  });
+  if (admin) {
+    res.status(200).json(admin);
+  }
+};
 // verifyUser
 
 const verifyEmail = async (req, res) => {
@@ -1019,4 +1035,5 @@ module.exports = {
   updateAdminPassword,
   getStats,
   getProductByName,
+  addAdmin,
 };
