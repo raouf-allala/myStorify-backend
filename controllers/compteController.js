@@ -320,6 +320,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: '1d',
     });
+    console.log(token);
     res.cookie('token', token, {
       httpOnly: true,
     });
