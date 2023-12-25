@@ -322,7 +322,7 @@ const loginUser = asyncHandler(async (req, res) => {
     });
     console.log(token);
     res.cookie('token', token, {
-      httpOnly: true,
+      httpOnly: false,
     });
     res.status(200).json(loggedUser);
   } else {
