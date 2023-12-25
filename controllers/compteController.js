@@ -290,6 +290,9 @@ const loginUser = asyncHandler(async (req, res) => {
         },
       },
     },
+    skip: {
+      password: true,
+    },
   });
   const admin = await prisma.admin.findFirst({
     where: {
@@ -322,7 +325,8 @@ const loginUser = asyncHandler(async (req, res) => {
     });
     console.log(token);
     res.cookie('token', token, {
-      httpOnly: false,
+      httpOnly: true,
+      secure: true,
     });
     res.status(200).json(loggedUser);
   } else {
